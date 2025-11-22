@@ -1,0 +1,14 @@
+package Messenger.demo.constant;
+
+import java.time.Duration;
+
+public class RedisKeyTTL {
+    public static final Duration TOKEN_TTL = Duration.ofHours(2);          // JWT token sống 2 giờ
+    public static final Duration REFRESH_TOKEN_TTL = Duration.ofDays(7);   // Refresh token sống 7 ngày
+    public static final Duration OTP_TTL = Duration.ofMinutes(5);          // OTP sống 5 phút
+    public static final Duration ACTIVE_ACCOUNT_TTL = Duration.ofHours(24); // Link kích hoạt sống 24 giờ
+    public static final Duration USER_INFO_TTL = Duration.ofHours(1);       // Cache thông tin user 1 giờ
+
+    private RedisKeyTTL() {
+    }
+}
