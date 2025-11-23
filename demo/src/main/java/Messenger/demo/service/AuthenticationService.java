@@ -3,11 +3,8 @@ package Messenger.demo.service;
  import Messenger.demo.Enum.Role;
  import Messenger.demo.constant.RedisKeyTTL;
  import Messenger.demo.constant.RedisPrefixKeyConstant;
- import Messenger.demo.dto.request.AccountRegisterRequest;
- import Messenger.demo.dto.request.AuthenticationRequest;
- import Messenger.demo.dto.request.IntrospectRequest;
+ import Messenger.demo.dto.request.*;
  import Messenger.demo.dto.response.AuthenticationResponse;
- import Messenger.demo.dto.response.IntrospectResponse;
  import Messenger.demo.dto.response.UserResponse;
  import Messenger.demo.exception.AppException;
  import Messenger.demo.exception.ErrorCode;
@@ -16,9 +13,7 @@ package Messenger.demo.service;
  import Messenger.demo.repository.UserRepository;
  import com.nimbusds.jose.*;
  import com.nimbusds.jose.crypto.MACSigner;
- import com.nimbusds.jose.crypto.MACVerifier;
  import com.nimbusds.jwt.JWTClaimsSet;
- import com.nimbusds.jwt.SignedJWT;
  import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,15 +24,10 @@ import org.springframework.beans.factory.annotation.Value;
  import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  import org.springframework.security.crypto.password.PasswordEncoder;
  import org.springframework.stereotype.Service;
- import org.springframework.transaction.annotation.Transactional;
  import org.springframework.util.CollectionUtils;
-
- import java.text.ParseException;
- import java.time.Duration;
  import java.time.Instant;
  import java.time.temporal.ChronoUnit;
  import java.util.*;
- import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +38,7 @@ public class AuthenticationService {
     RedisTemplate<String, Object> redisTemplate;
     MailService mailService;
     UserMapper userMapper;
+    UserService userService;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -192,4 +183,55 @@ public class AuthenticationService {
         return stringJoiner.toString();
     }
 
+    public void logout(LogoutRequest request) {
+        redisTemplate.delete(RedisPrefixKeyConstant.TOKEN + request.getToken());
+        redisTemplate.delete(RedisPrefixKeyConstant.REFRESH_TOKEN + request.getRefreshToken());
+    }
+
+    public AuthenticationResponse refreshToken(RefreshRequest refreshToken) {
+        String redisKey = RedisPrefixKeyConstant.REFRESH_TOKEN + refreshToken.getRefreshToken();
+        String userId = (String) redisTemplate.opsForValue().get(redisKey);
+        if (userId == null) {
+            throw new AppException(ErrorCode.INVALID_OR_EXPIRED_TOKEN);
+        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        var newToken = generateToken(user);
+        redisTemplate.opsForValue().set(
+                RedisPrefixKeyConstant.TOKEN + newToken,
+                user.getId(),
+                RedisKeyTTL.TOKEN_TTL
+        );
+        return AuthenticationResponse.builder()
+                .token(newToken)
+                .refreshToken(refreshToken.getRefreshToken())
+                .authenticated(true)
+                .build();
+
+    }
+
+    public void requestOtp(SendOtpRequest request) {
+        User user = userService.getCurrentUser();
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!authenticated) throw new AppException(ErrorCode.UNAUTHENTICATED);
+        String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        redisTemplate.opsForValue().set(
+                RedisPrefixKeyConstant.OTP_CHANGE_PASSWORD + user.getId(),
+                otp,
+                RedisKeyTTL.OTP_CHANGE_PASSWORD_TTL
+        );
+        mailService.sendOtpChangePasswordEmail(user.getEmail(), otp, user.getUsername());
+    }
+
+    public void changePassword(ChangePasswordRequest request) {
+        User user = userService.getCurrentUser();
+        String cachedOtp = (String) redisTemplate.opsForValue().get(RedisPrefixKeyConstant.OTP_CHANGE_PASSWORD + user.getId());
+        if (cachedOtp == null || !cachedOtp.equals(request.getOtp())) {
+            throw new AppException(ErrorCode.INVALID_OR_EXPIRED_TOKEN);
+        }
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        redisTemplate.delete(RedisPrefixKeyConstant.OTP_CHANGE_PASSWORD + user.getId());
+    }
 }

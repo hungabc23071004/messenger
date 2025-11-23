@@ -28,4 +28,21 @@ public class MailService {
         helper.setText(content, true); //
         mailSender.send(message);
     }
+
+    public void sendOtpChangePasswordEmail(String email, String otp, String username) {
+        String subject = "Mã OTP thay đổi mật khẩu cho tài khoản " + username;
+        String content = "<b>Đây là mã OTP để thay đổi mật khẩu cho tài khoản " + username + " trên ứng dụng Messenger:</b><br><br>"
+                + "<h2>" + otp + "</h2><br>"
+                + "Mã OTP có hiệu lực trong 5 phút.";
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(content, true); //
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Failed to send OTP change password email to {}: {}", email, e.getMessage());
+        }
+    }
 }

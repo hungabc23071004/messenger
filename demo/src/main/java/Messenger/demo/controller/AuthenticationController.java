@@ -1,7 +1,6 @@
 package Messenger.demo.controller;
 
-import Messenger.demo.dto.request.AccountRegisterRequest;
-import Messenger.demo.dto.request.AuthenticationRequest;
+import Messenger.demo.dto.request.*;
 import Messenger.demo.dto.response.ApiResponse;
 import Messenger.demo.dto.response.AuthenticationResponse;
 import Messenger.demo.dto.response.UserResponse;
@@ -47,4 +46,35 @@ public class AuthenticationController {
                 .build();
     }
 
+    @PostMapping("/logout")
+    public ApiResponse<Void > logout(@RequestBody LogoutRequest request){
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .message("Logout successfully")
+                .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ApiResponse<AuthenticationResponse> refreshToken(@RequestBody RefreshRequest refreshToken){
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(authenticationService.refreshToken(refreshToken))
+                .message("Refresh token successfully")
+                .build();
+    }
+
+    @PostMapping("/request-otp")
+    public ApiResponse<Void> requestOtp(@RequestBody SendOtpRequest request) {
+        authenticationService.requestOtp(request);
+        return ApiResponse.<Void>builder()
+                .message("OTP has been send successfully")
+                .build();
+    }
+
+    @PostMapping("/change-password")
+    public ApiResponse<Void> changePassword(@RequestBody ChangePasswordRequest request) {
+        authenticationService.changePassword(request);
+        return ApiResponse.<Void>builder()
+                .message("Change password successfully")
+                .build();
+    }
 }
