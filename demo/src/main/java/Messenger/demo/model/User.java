@@ -29,10 +29,13 @@ public class User {
     String email;
     String password; // BCrypt hash
 
+
     // Profile
     String fullName;
     String avatarUrl;
     String bio;
+    String gender; // male, female, other
+    LocalDateTime dateOfBirth;
 
     // Status / presence
     String status; // online, offline, busy
