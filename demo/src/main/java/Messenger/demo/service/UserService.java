@@ -1,7 +1,12 @@
 package Messenger.demo.service;
 
+import Messenger.demo.constant.MinioPrefixConstant;
+import Messenger.demo.dto.request.UserAvatarRequest;
+import Messenger.demo.dto.request.UserUpdateRequest;
+import Messenger.demo.dto.response.UserResponse;
 import Messenger.demo.exception.AppException;
 import Messenger.demo.exception.ErrorCode;
+import Messenger.demo.mapper.UserMapper;
 import Messenger.demo.model.User;
 import Messenger.demo.repository.UserRepository;
 import lombok.AccessLevel;
@@ -10,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -18,10 +24,43 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     UserRepository userRepository;
+    UserMapper userMapper;
+    FileService fileService;
 
        public User getCurrentUser() {
         User user = userRepository.findById(SecurityContextHolder.getContext().getAuthentication().getName())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return user;
        }
+
+    public UserResponse getMyInfor() {
+        User user = getCurrentUser();
+        return userMapper.toUserResponse(user);
+    }
+
+    public UserResponse updateMyInfor(UserUpdateRequest request) {
+        User user = getCurrentUser();
+        userMapper.updateUser(request, user);
+        user = userRepository.save(user);
+        return userMapper.toUserResponse(user);
+    }
+
+    public String  uploadAvatar(UserAvatarRequest request) {
+           User user = getCurrentUser();
+           if(user.getAvatarUrl() != null){
+               fileService.delete(user.getAvatarUrl());
+           }
+           String url = fileService.upload(request.getFile(), MinioPrefixConstant.AVATARS);
+           user.setAvatarUrl(url);
+           userRepository.save(user);
+           return url;
+    }
+
+    public UserResponse getUserById(String id) {
+           return userRepository.findById(id)
+                   .map(userMapper::toUserResponse)
+                   .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    }
+
+
 }

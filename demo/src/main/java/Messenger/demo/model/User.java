@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,7 @@ public class User {
     String avatarUrl;
     String bio;
     String gender; // male, female, other
-    LocalDateTime dateOfBirth;
+    LocalDate dateOfBirth;
 
     // Status / presence
     String status; // online, offline, busy
