@@ -15,7 +15,8 @@ public enum ErrorCode {
     UNAUTHORIZED(1007, "You do not have permision", HttpStatus.FORBIDDEN),
     INVALID_DOB(1008, "Your age must be at least {min}", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1009,"Email is already used with another account", HttpStatus.BAD_REQUEST),
-    INVALID_OR_EXPIRED_TOKEN(1010,"Your token has been expired" ,HttpStatus.BAD_REQUEST );
+    INVALID_OR_EXPIRED_TOKEN(1010,"Your token has been expired" ,HttpStatus.BAD_REQUEST ),
+    FRIENDSHIP_NOT_FOUND(1011,"Friend Ship hasn't been found" ,HttpStatus.NOT_FOUND );
 
 
     private Integer code;

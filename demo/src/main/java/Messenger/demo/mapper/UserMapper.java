@@ -6,6 +6,8 @@ import Messenger.demo.dto.response.UserResponse;
 import Messenger.demo.model.User;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     User toUser(AccountRegisterRequest request);
@@ -14,4 +16,6 @@ public interface UserMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(UserUpdateRequest request, @MappingTarget User user);
+
+    List<UserResponse> toUserResponseList(List<User> users);
 }
