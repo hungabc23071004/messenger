@@ -39,7 +39,7 @@ public class SecurityConfig {
                             config.addAllowedOrigin("http://localhost:5173");
                             config.addAllowedMethod("*");
                             config.addAllowedHeader("*");
-                            config.setAllowCredentials(true); // nếu origin là * thì xóa dòng này
+                            config.setAllowCredentials(true);
                             return config;
                         })
                 );
@@ -49,7 +49,6 @@ public class SecurityConfig {
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(csrf -> csrf.disable());
-
         return httpSecurity.build();
     }
 

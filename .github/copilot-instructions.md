@@ -1,55 +1,77 @@
-# Copilot Instructions for Messenger Demo
+# Copilot Instructions for Messenger Codebase
 
-## Project Overview
+## Overview
 
-This is a Spring Boot-based Messenger application. The codebase is organized by feature and responsibility, following standard Java backend conventions with some project-specific patterns.
+This repository is a full-stack messaging application with a Java Spring Boot backend and a React + Vite frontend. The backend uses MongoDB for data storage, Redis for caching and presence, and MinIO for file storage. Real-time features are implemented using WebSockets (STOMP over SockJS). The frontend is a modern React SPA styled with Tailwind CSS.
 
-## Architecture & Major Components
+## Architecture
 
-- **Entry Point:** `DemoApplication.java` in `src/main/java/Messenger/demo/`.
-- **Config:** Security and JWT configuration in `config/` (e.g., `SecurityConfig.java`, `CustomJwtDecoder.java`).
-- **Controllers:** API endpoints are defined in `controller/` (not shown, but expected by convention).
-- **DTOs:** Request/response objects in `dto/request/` and `dto/response/`.
-- **Enums:** Domain-specific enums in `Enum/` (e.g., `Role`, `MessageType`).
-- **Exceptions:** Centralized error handling in `exception/` (e.g., `GlobalExceptionHandler.java`).
-- **Models:** Core entities in `model/` (e.g., `User`, `Message`, `Conversation`).
-- **Repositories:** Data access interfaces (e.g., `UserRepository.java`).
-- **Services:** Business logic in `service/` (e.g., `AuthenticationService.java`).
+- **Backend (Spring Boot, `demo/`)**
+  - REST APIs for authentication, user, friendship, and chat management (`controller/`)
+  - WebSocket endpoints for real-time chat and presence (`controller/ChatWebSocketController.java`, `config/websocket/`)
+  - MongoDB models for users, friendships, conversations, and messages (`model/`)
+  - Redis is used for caching, presence, OTP, and token/session management (`constant/RedisPrefixKeyConstant.java`)
+  - MinIO integration for file/media storage (`config/MinIOConfig.java`)
+  - Security via JWT and OAuth2 (`config/SecurityConfig.java`, `config/CustomJwtDecoder.java`)
+  - DTOs and mappers for request/response transformation (`dto/`, `mapper/`)
+- **Frontend (React + Vite, `FE/`)**
+  - SPA with routing (`src/page/`), API calls (`src/api/`), and reusable components (`src/components/`)
+  - Uses STOMP over WebSocket for real-time features
+  - Tailwind CSS for styling
 
 ## Developer Workflows
 
-- **Build:** Use Maven wrapper scripts (`mvnw`, `mvnw.cmd`). Example: `./mvnw clean install` (Linux/macOS) or `mvnw.cmd clean install` (Windows).
-- **Run:** Start the app with `./mvnw spring-boot:run` or `mvnw.cmd spring-boot:run`.
-- **Test:** Run tests with `./mvnw test` or `mvnw.cmd test`. Main test class: `DemoApplicationTests.java`.
-- **Config:** App configuration is in `src/main/resources/application.properties`.
+- **Backend**
+  - Build: `cd demo && ./mvnw clean install` (or `mvnw.cmd` on Windows)
+  - Run: `./mvnw spring-boot:run` (or `mvnw.cmd spring-boot:run`)
+  - Test: `./mvnw test` (unit tests in `src/test/java/`)
+  - Format: `./mvnw spotless:apply` (uses Spotless plugin)
+  - Environment: Configure in `src/main/resources/application.properties`
+  - MongoDB, Redis, and MinIO must be running (see `src/Docker/MinIO/docker-compose.yml` for MinIO setup)
+- **Frontend**
+  - Install: `cd FE && npm install`
+  - Dev server: `npm run dev` (default: http://localhost:5173)
+  - Build: `npm run build`
+  - Lint: `npm run lint`
 
-## Patterns & Conventions
+## Project-Specific Patterns & Conventions
 
-- **Feature-based Package Structure:** Each domain concept (e.g., model, service, dto) has its own package.
-- **DTO Usage:** All controller endpoints should use DTOs for input/output, not entities directly.
-- **Exception Handling:** Use `AppException` and `GlobalExceptionHandler` for error management.
-- **Security:** JWT-based authentication is configured in `SecurityConfig.java` and related files.
-- **Enums:** Use enums for roles, message types, and other domain constants.
+- **WebSocket Topics:**
+  - Presence: `/topic/presence.{userId}`
+  - Chat messages: `/topic/conversation.{conversationId}/message`
+  - Seen/typing: `/topic/conversation.{conversationId}/seen`, `/topic/conversation.{conversationId}/typing`
+- **Redis Keys:**
+  - See `RedisPrefixKeyConstant.java` for all key prefixes (e.g., `TOKEN_`, `ONLINE_`, `UNREAD_`)
+- **DTO/Entity Mapping:**
+  - Uses MapStruct (`mapper/`) for mapping between entities and DTOs
+- **Security:**
+  - JWT tokens are required for `/api/**` endpoints; `/messenger/**` is public
+  - Custom JWT decoder and authentication entry point are implemented
+- **Testing:**
+  - Unit tests are in `src/test/java/`
+  - JaCoCo is configured for coverage (see `pom.xml`)
+- **File Uploads:**
+  - Handled via MinIO; see `MinIOConfig.java` and related services
 
 ## Integration Points
 
-- **Spring Security:** Custom JWT decoder and authentication entry point.
-- **Persistence:** Likely uses Spring Data JPA (see `UserRepository.java`).
-- **Static/Template Resources:** Place frontend assets in `src/main/resources/static/` and templates in `templates/`.
+- **MongoDB:** Data storage for all main entities
+- **Redis:** Caching, session, presence, OTP, and token management
+- **MinIO:** File/media storage (see Docker Compose for local setup)
+- **WebSocket:** Real-time chat and presence updates
 
 ## Examples
 
-- To add a new API endpoint, create a controller in `controller/`, define DTOs in `dto/request` and `dto/response`, and update the service layer.
-- To add a new entity, create a model in `model/`, a repository in `repository/`, and update related services.
+- To send a chat message: use `@MessageMapping("/conversation/{conversationId}/send")` in `ChatWebSocketController.java`
+- To update presence: handled in `WebSocketPresenceListener.java` and broadcast to `/topic/presence.{peerId}`
+- To add a new Redis key: update `RedisPrefixKeyConstant.java` and use `redisTemplate` in services
 
-## Key Files
+## References
 
-- `DemoApplication.java`: Main entry point
-- `SecurityConfig.java`: Security setup
-- `application.properties`: Configuration
-- `GlobalExceptionHandler.java`: Error handling
-- `UserRepository.java`: Example repository
+- Backend entry: `demo/src/main/java/Messenger/demo/DemoApplication.java`
+- Frontend entry: `FE/src/main.jsx`
+- Main configuration: `application.properties`, `pom.xml`, `vite.config.js`
 
 ---
 
-**For questions or unclear patterns, ask for clarification or examples from maintainers.**
+If any section is unclear or missing, please provide feedback for further refinement.

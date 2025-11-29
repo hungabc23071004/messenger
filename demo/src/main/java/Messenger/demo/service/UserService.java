@@ -4,6 +4,7 @@ import Messenger.demo.constant.MinioPrefixConstant;
 import Messenger.demo.dto.request.UserAvatarRequest;
 import Messenger.demo.dto.request.UserUpdateRequest;
 import Messenger.demo.dto.response.UserResponse;
+import Messenger.demo.dto.response.UserShortInfoResponse;
 import Messenger.demo.exception.AppException;
 import Messenger.demo.exception.ErrorCode;
 import Messenger.demo.mapper.UserMapper;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +65,12 @@ public class UserService {
                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
     }
 
+
+    public List<UserShortInfoResponse> getUserShortInfoByIds(List<String> ids) {
+           List<User> users = userRepository.findByIdIn(ids);
+           return users.stream()
+                   .map(userMapper::toShortInfoUserResponse)
+                   .toList();
+    }
 
 }
