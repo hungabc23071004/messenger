@@ -116,7 +116,7 @@ export default function ChatBox({ conversationId }) {
     if (!input.trim() && !file) return;
 
     let type = "TEXT";
-    let mediaUrl = [];
+    let mediaUrl = null;
     if (file) {
       if (file.type.startsWith("image/")) type = "IMAGE";
       else if (file.type.startsWith("video/")) type = "VIDEO";
@@ -124,7 +124,7 @@ export default function ChatBox({ conversationId }) {
       // Upload file lên server lấy url
       try {
         const token = localStorage.getItem("token");
-        mediaUrl = [await uploadFiles([file], token)[0]];
+        mediaUrl = await uploadFiles([file], token);
       } catch (e) {
         alert("Lỗi upload file");
         return;
@@ -153,7 +153,7 @@ export default function ChatBox({ conversationId }) {
 
   return (
     <div className="flex flex-col h-full border rounded shadow bg-white">
-      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-transparent">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-transparent max-h-[70vh] min-h-[200px]">
         {messages.map((m, i) => {
           const isMe = m.senderId === (userId || "");
           const sender = userMap[m.senderId];
@@ -178,15 +178,25 @@ export default function ChatBox({ conversationId }) {
                   isMe ? "items-end" : "items-start"
                 }`}
               >
-                <span
-                  className={`px-4 py-2 rounded-2xl text-base shadow-sm break-words ${
-                    isMe
-                      ? "bg-yellow-600 text-white rounded-br-md"
-                      : "bg-white text-gray-900 rounded-bl-md border"
-                  }`}
-                >
-                  {m.content}
-                </span>
+                {/* Hiển thị nội dung tin nhắn */}
+                {m.type === "IMAGE" && m.mediaUrl ? (
+                  <img
+                    src={m.mediaUrl}
+                    alt="img"
+                    className="max-w-[320px] max-h-[220px] rounded-2xl border object-cover mb-1"
+                  />
+                ) : null}
+                {m.content && (
+                  <span
+                    className={`px-4 py-2 rounded-2xl text-base shadow-sm break-words ${
+                      isMe
+                        ? "bg-yellow-600 text-white rounded-br-md"
+                        : "bg-white text-gray-900 rounded-bl-md border"
+                    }`}
+                  >
+                    {m.content}
+                  </span>
+                )}
 
                 <span className="text-xs text-gray-400 mt-1 select-none">
                   {m.createdAt ? dayjs(m.createdAt).format("HH:mm DD/MM") : ""}
