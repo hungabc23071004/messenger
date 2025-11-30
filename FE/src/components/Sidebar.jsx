@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 export default function Sidebar() {
   return (
     <aside className="w-60 p-4 bg-white shadow hidden md:block min-h-[calc(100vh-56px)]">
@@ -8,7 +7,7 @@ export default function Sidebar() {
           Trang chủ
         </Link>
         <Link to="/chat">Tin nhắn</Link>
-        <a href="#">Bạn bè</a>
+        <Link to="/friends">Bạn bè</Link>
         <a href="#">Nhóm</a>
         <a href="#">Thông báo</a>
         <a href="#">Cài đặt</a>

@@ -134,7 +134,7 @@ export default function ChatBox({ conversationId }) {
     const msg = {
       conversationId,
       senderId: userId,
-      content: input,
+      content: type === "FILE" && file ? file.name : input,
       type,
       mediaUrl,
     };
@@ -178,7 +178,32 @@ export default function ChatBox({ conversationId }) {
                   isMe ? "items-end" : "items-start"
                 }`}
               >
-                {/* Hiển thị nội dung tin nhắn */}
+                {/* Hiển thị file */}
+                {m.type === "FILE" && m.mediaUrl ? (
+                  <a
+                    href={m.mediaUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`flex flex-col px-4 py-2 rounded-2xl shadow-sm mb-1 max-w-[260px] min-w-[180px] ${
+                      isMe
+                        ? "bg-yellow-100 rounded-br-md"
+                        : "bg-gray-100 rounded-bl-md border"
+                    }`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-2xl">📄</span>
+                      <span
+                        className="font-medium text-gray-900 truncate"
+                        title={m.content}
+                      >
+                        {m.content}
+                      </span>
+                    </div>
+                  </a>
+                ) : null}
+
+                {/* Hiển thị ảnh */}
                 {m.type === "IMAGE" && m.mediaUrl ? (
                   <img
                     src={m.mediaUrl}
@@ -186,7 +211,9 @@ export default function ChatBox({ conversationId }) {
                     className="max-w-[320px] max-h-[220px] rounded-2xl border object-cover mb-1"
                   />
                 ) : null}
-                {m.content && (
+
+                {/* Hiển thị text */}
+                {m.type !== "FILE" && m.content && (
                   <span
                     className={`px-4 py-2 rounded-2xl text-base shadow-sm break-words ${
                       isMe
@@ -251,16 +278,16 @@ export default function ChatBox({ conversationId }) {
                 <img
                   src={URL.createObjectURL(file)}
                   alt={file.name}
-                  className="w-10 h-10 object-cover rounded border"
+                  className="w-16 h-16 object-cover rounded border"
                 />
               ) : file.type.startsWith("video/") ? (
                 <video
                   src={URL.createObjectURL(file)}
-                  className="w-10 h-10 rounded border"
+                  className="w-16 h-16 rounded border"
                   controls
                 />
               ) : (
-                <div className="px-2 py-1 bg-gray-100 rounded text-xs border w-16 h-10 flex items-center justify-center">
+                <div className="px-2 py-1 bg-gray-100 rounded text-xs border w-24 h-12 flex items-center justify-center">
                   {file.name}
                 </div>
               )}

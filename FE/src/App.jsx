@@ -2,6 +2,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./page/Login";
 import Home from "./page/Home";
 import ChatPage from "./page/ChatPage";
+import FriendsPage from "./page/FriendsPage";
 import React, { useEffect, useState } from "react";
 import { connectWebSocket, disconnectWebSocket } from "./api/WebsocketService";
 import LogoutModal from "./components/LogoutModal";
@@ -71,6 +72,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/friends" element={<FriendsPage />} />
       </Routes>
 
       {/* Modal báo hết hạn */}

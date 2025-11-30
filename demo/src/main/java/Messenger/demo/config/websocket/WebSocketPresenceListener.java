@@ -47,7 +47,7 @@ public class WebSocketPresenceListener {
         String userId = getUserIdFromEvent(event);
         if (userId == null) return;
 
-        redisTemplate.opsForValue().set(RedisPrefixKeyConstant.ONLINE + userId, false);
+        redisTemplate.delete(RedisPrefixKeyConstant.ONLINE + userId);
         LocalDateTime lastSeen = LocalDateTime.now();
         redisTemplate.opsForValue().set(RedisPrefixKeyConstant.LAST_SEEN + userId, lastSeen);
 
