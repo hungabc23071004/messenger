@@ -72,4 +72,14 @@ public class FriendshipController {
                 .build();
 
     }
+
+    @GetMapping("/online_friends")
+    public ApiResponse<List<UserResponse>> getOnlineFriends() {
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(friendshipService.getOnlineFriends())
+                .message("Online friends retrieved successfully")
+                .build();
+    }
+
+
 }

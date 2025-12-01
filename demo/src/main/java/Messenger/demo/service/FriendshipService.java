@@ -1,6 +1,7 @@
 package Messenger.demo.service;
 
 import Messenger.demo.Enum.FriendShipStatus;
+import Messenger.demo.constant.RedisPrefixKeyConstant;
 import Messenger.demo.dto.request.FriendShipRequest;
 import Messenger.demo.dto.response.FriendShipResponse;
 import Messenger.demo.dto.response.UserResponse;
@@ -15,6 +16,7 @@ import Messenger.demo.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ public class FriendshipService {
     UserService userService;
     FriendShipMapper friendShipMapper;
     UserMapper userMapper;
+    RedisTemplate <String, Object> redisTemplate;
 
     public FriendShipResponse sendFriendRequest(FriendShipRequest request) {
         User user = userService.getCurrentUser();
@@ -84,4 +87,23 @@ public class FriendshipService {
         List<Friendship> friendships = friendshipRepository.findByReceiverIdAndStatus(userId, FriendShipStatus.PENDING);
         return friendShipMapper.toFriendShipResponseList(friendships);
     }
+
+    public List<UserResponse> getOnlineFriends() {
+        User user = userService.getCurrentUser();
+        String userId = user.getId();
+        List<Friendship> friendships = friendshipRepository.findByInviterIdOrReceiverIdAndStatus(userId, userId, FriendShipStatus.ACCEPTED);
+        List<String> friendIds = friendships.stream()
+                .map(f -> f.getInviterId().equals(userId) ? f.getReceiverId() : f.getInviterId())
+                .toList();
+
+        List<String> onlineFriendIds = friendIds.stream()
+                .filter(fid -> {
+                    Object val = redisTemplate.opsForValue().get(RedisPrefixKeyConstant.ONLINE + fid);
+                    return Boolean.TRUE.equals(val);
+                })
+                .toList();
+
+        return userMapper.toUserResponseList(userRepository.findAllById(onlineFriendIds));
+    }
+
 }

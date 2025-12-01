@@ -49,7 +49,7 @@ public class WebSocketPresenceListener {
 
         redisTemplate.delete(RedisPrefixKeyConstant.ONLINE + userId);
         LocalDateTime lastSeen = LocalDateTime.now();
-        redisTemplate.opsForValue().set(RedisPrefixKeyConstant.LAST_SEEN + userId, lastSeen);
+        redisTemplate.opsForValue().set(RedisPrefixKeyConstant.LAST_SEEN + userId, lastSeen.toString());
 
         List<String> peers = getAllPeers(userId);
         peers.forEach(peerId -> {
