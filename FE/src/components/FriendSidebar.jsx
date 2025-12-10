@@ -10,7 +10,7 @@ export default function FriendSidebar({ selected, onSelect }) {
     { key: "custom", label: "Danh sách tùy chỉnh", icon: "📋" },
   ];
   return (
-    <aside className="w-72 bg-white border-r flex flex-col py-4 px-2 min-h-screen">
+    <aside className="w-72 bg-white border-r flex flex-col py-4 px-2">
       <h2 className="text-2xl font-bold px-4 mb-4">Bạn bè</h2>
       <nav className="flex flex-col gap-1">
         {MENU.map((item) => (

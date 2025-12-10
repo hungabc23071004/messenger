@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Header from "../components/Header";
 import FriendSidebar from "../components/FriendSidebar";
 import FriendCard from "../components/FriendCard";
 
@@ -81,46 +82,54 @@ const FAKE_FRIENDS = [
 export default function FriendsPage() {
   const [selectedTab, setSelectedTab] = useState("all");
 
-  // Filter friends based on selected tab (for demo, all tabs show all friends)
-  // You can implement real filtering logic here
   const filteredFriends = FAKE_FRIENDS;
 
-  // Demo handlers
   const handleAccept = (friend) => {
     alert(`Đã xác nhận kết bạn với ${friend.name}`);
   };
+
   const handleRemove = (friend) => {
     alert(`Đã xóa ${friend.name} khỏi danh sách bạn bè`);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <FriendSidebar selected={selectedTab} onSelect={setSelectedTab} />
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold">
-            {selectedTab === "all" && "Tất cả bạn bè"}
-            {selectedTab === "requests" && "Lời mời kết bạn"}
-            {selectedTab === "suggest" && "Gợi ý"}
-            {selectedTab === "birthday" && "Sinh nhật"}
-            {selectedTab === "custom" && "Danh sách tuỳ chỉnh"}
-            {selectedTab === "home" && "Trang chủ bạn bè"}
-          </h3>
-          <button className="text-blue-600 font-medium hover:underline">
-            Xem tất cả
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredFriends.map((f) => (
-            <FriendCard
-              key={f.id}
-              friend={f}
-              onAccept={selectedTab === "requests" ? handleAccept : undefined}
-              onRemove={handleRemove}
-            />
-          ))}
-        </div>
-      </main>
+    <div className="flex flex-col h-screen overflow-hidden">
+      <Header />
+      <div className="flex flex-1 overflow-hidden">
+        <FriendSidebar selected={selectedTab} onSelect={setSelectedTab} />
+        <main className="flex-1 overflow-y-auto bg-gray-100">
+          <div className="px-6 py-5 bg-white border-b">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-gray-800">
+                {selectedTab === "all" && "Tất cả bạn bè"}
+                {selectedTab === "requests" && "Lời mời kết bạn"}
+                {selectedTab === "suggest" && "Gợi ý"}
+                {selectedTab === "birthday" && "Sinh nhật"}
+                {selectedTab === "custom" && "Danh sách tuỳ chỉnh"}
+                {selectedTab === "home" && "Trang chủ bạn bè"}
+              </h3>
+              <button className="text-blue-600 font-medium hover:underline">
+                Xem tất cả
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+              {filteredFriends.map((f) => (
+                <FriendCard
+                  key={f.id}
+                  friend={f}
+                  onAccept={
+                    selectedTab === "requests" ? handleAccept : undefined
+                  }
+                  onRemove={handleRemove}
+                />
+              ))}
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

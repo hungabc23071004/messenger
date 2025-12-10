@@ -1,31 +1,24 @@
 import { useEffect, useRef, useState } from "react";
-import { getStompClient } from "../api/WebsocketService";
+import { getStompClient, connectWebSocket } from "../api/WebsocketService";
 import { fetchMessages, fetchConversationDetail } from "../api/conversation";
 import { uploadFiles } from "../api/file";
 import dayjs from "dayjs";
-import { jwtDecode } from "jwt-decode";
+import { getCurrentUserId } from "../utils/auth";
 
 export default function ChatBox({ conversationId }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [userMap, setUserMap] = useState({});
   const [file, setFile] = useState(null); // For selected file
+  const [fullImageUrl, setFullImageUrl] = useState(null); // State for full image view
+  const [fullMedia, setFullMedia] = useState(null); // {type, url}
 
   const stompRef = useRef(null);
   const subRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   // Lấy userId từ JWT token
-  const token = localStorage.getItem("token");
-  let userId = null;
-  if (token) {
-    try {
-      const decoded = jwtDecode(token);
-      userId = decoded.sub;
-    } catch (e) {
-      console.error("Invalid token", e);
-    }
-  }
+  const userId = getCurrentUserId();
 
   // -------------------------------------------
   // FETCH MESSAGE & USER MAP
@@ -35,7 +28,7 @@ export default function ChatBox({ conversationId }) {
     if (!conversationId || !token) return;
 
     fetchMessages(conversationId, token)
-      .then((data) => setMessages(data))
+      .then((data) => setMessages(data.reverse()))
       .catch(() => setMessages([]));
 
     fetchConversationDetail(conversationId, token).then((conv) => {
@@ -49,11 +42,11 @@ export default function ChatBox({ conversationId }) {
   // SUBSCRIBE WEBSOCKET AN TOÀN
   // -------------------------------------------
   useEffect(() => {
-    const client = getStompClient();
-    if (!client) return;
+    if (!conversationId) return;
 
-    const trySubscribe = () => {
-      if (!client.connected) return;
+    connectWebSocket(() => {
+      const client = getStompClient();
+      if (!client || !client.connected) return;
 
       stompRef.current = client;
 
@@ -71,25 +64,16 @@ export default function ChatBox({ conversationId }) {
         `/topic/conversation.${conversationId}/message`,
         (msg) => {
           const body = JSON.parse(msg.body);
+          console.log("Nhận tin nhắn mới:", body);
           setMessages((prev) => [...prev, body]);
         }
       );
-    };
 
-    // Nếu stomp đã connect → sub luôn
-    if (client.connected) {
-      trySubscribe();
-    } else {
-      // Nếu chưa connect → đợi nó connect
-      const wait = setInterval(() => {
-        if (client.connected) {
-          clearInterval(wait);
-          trySubscribe();
-        }
-      }, 200);
-
-      return () => clearInterval(wait);
-    }
+      console.log(
+        "Đã subscribe:",
+        `/topic/conversation.${conversationId}/message`
+      );
+    });
 
     return () => {
       if (subRef.current) {
@@ -139,12 +123,15 @@ export default function ChatBox({ conversationId }) {
       mediaUrl,
     };
 
-    if (stompRef.current?.connected) {
-      stompRef.current.send(
-        `/app/conversation/${conversationId}/send`,
-        {},
-        JSON.stringify(msg)
-      );
+    const client = stompRef.current || getStompClient();
+    if (client && client.connected) {
+      client.publish({
+        destination: `/app/conversation/${conversationId}/send`,
+        body: JSON.stringify(msg),
+      });
+      console.log("Tin nhắn đã gửi:", msg);
+    } else {
+      console.error("WebSocket chưa kết nối");
     }
 
     setInput("");
@@ -203,12 +190,27 @@ export default function ChatBox({ conversationId }) {
                   </a>
                 ) : null}
 
+                {/* Hiển thị video */}
+                {m.type === "VIDEO" && m.mediaUrl ? (
+                  <video
+                    src={m.mediaUrl}
+                    controls
+                    className="max-w-[320px] max-h-[220px] rounded-2xl border object-cover mb-1 cursor-pointer"
+                    onClick={() =>
+                      setFullMedia({ type: "VIDEO", url: m.mediaUrl })
+                    }
+                  />
+                ) : null}
+
                 {/* Hiển thị ảnh */}
                 {m.type === "IMAGE" && m.mediaUrl ? (
                   <img
                     src={m.mediaUrl}
                     alt="img"
-                    className="max-w-[320px] max-h-[220px] rounded-2xl border object-cover mb-1"
+                    className="max-w-[320px] max-h-[220px] rounded-2xl border object-cover mb-1 cursor-pointer"
+                    onClick={() =>
+                      setFullMedia({ type: "IMAGE", url: m.mediaUrl })
+                    }
                   />
                 ) : null}
 
@@ -309,6 +311,38 @@ export default function ChatBox({ conversationId }) {
           Gửi
         </button>
       </div>
+
+      {/* Full Media Modal */}
+      {fullMedia && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+          onClick={() => setFullMedia(null)}
+        >
+          {fullMedia.type === "IMAGE" ? (
+            <img
+              src={fullMedia.url}
+              alt="Full view"
+              className="max-w-[90vw] max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <video
+              src={fullMedia.url}
+              controls
+              autoPlay
+              className="max-w-[90vw] max-h-[90vh] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
+          <button
+            className="absolute top-4 right-4 text-white text-lg font-bold hover:text-gray-300 w-8 h-8 flex items-center justify-center bg-black bg-opacity-40 rounded-full"
+            onClick={() => setFullMedia(null)}
+            style={{ lineHeight: 1 }}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 }

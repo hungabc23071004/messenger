@@ -7,6 +7,7 @@ import React, { useEffect, useState } from "react";
 import { connectWebSocket, disconnectWebSocket } from "./api/WebsocketService";
 import LogoutModal from "./components/LogoutModal";
 import Header from "./components/Header";
+import Profile from "./page/Profile";
 
 function App() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -73,6 +74,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/friends" element={<FriendsPage />} />
+        <Route path="/profile/:userId" element={<Profile />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
 
       {/* Modal báo hết hạn */}

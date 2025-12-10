@@ -17,12 +17,9 @@ export default function Home() {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-gray-100 overflow-hidden">
-      <div className="mb-2">
-        <Header />
-      </div>
-      <div className="flex flex-1 min-h-0">
-        <Sidebar />
-        <div className="flex flex-1 min-h-0">
+      <Header />
+      <div className="flex flex-1 min-h-0 max-w-[1920px] mx-auto w-full">
+        <div className="flex flex-1 min-h-0 shadow-lg bg-white">
           <ConversationList
             userId={userId}
             onSelect={setConversationId}

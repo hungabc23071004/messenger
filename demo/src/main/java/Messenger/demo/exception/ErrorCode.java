@@ -18,7 +18,8 @@ public enum ErrorCode {
     INVALID_OR_EXPIRED_TOKEN(1010,"Your token has been expired" ,HttpStatus.BAD_REQUEST ),
     FRIENDSHIP_NOT_FOUND(1011,"Friend Ship hasn't been found" ,HttpStatus.NOT_FOUND ),
     CONVERSATION_NOT_FOUND(1012,"Conversation hasn't been found" ,HttpStatus.NOT_FOUND ),
-    PARTNER_NOT_FOUND(1013,"Partner has been not found" ,HttpStatus.NOT_FOUND );
+    PARTNER_NOT_FOUND(1013,"Partner has been not found" ,HttpStatus.NOT_FOUND ),
+    POST_NOT_FOUND(1014,"Post has been not found" ,HttpStatus.NOT_FOUND );
 
 
     private Integer code;
