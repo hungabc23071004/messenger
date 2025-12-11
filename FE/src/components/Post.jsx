@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { AiOutlineLike, AiFillLike } from "react-icons/ai";
 import { BiComment } from "react-icons/bi";
+import PostDetailModal from "./PostDetailModal";
 
 export default function Post({
+  id,
   user,
   time,
   content,
@@ -11,6 +14,8 @@ export default function Post({
   comments = 0,
   onLike,
 }) {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div className="bg-white rounded shadow p-4">
       <div className="flex items-center gap-3 mb-2">
@@ -156,7 +161,10 @@ export default function Post({
           {liked ? <AiFillLike /> : <AiOutlineLike />}
           <span>Thích</span>
         </button>
-        <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded hover:bg-gray-100 transition text-gray-700">
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex-1 flex items-center justify-center gap-2 py-2 rounded hover:bg-gray-100 transition text-gray-700"
+        >
           <BiComment /> <span>Bình luận</span>
         </button>
         <button className="flex-1 flex items-center justify-center gap-2 py-2 rounded hover:bg-gray-100 transition text-gray-700">
@@ -175,6 +183,13 @@ export default function Post({
           <span>Chia sẻ</span>
         </button>
       </div>
+      {showModal && (
+        <PostDetailModal
+          post={{ id, user, time, content, images, likeCount, liked, comments }}
+          onClose={() => setShowModal(false)}
+          onLike={onLike}
+        />
+      )}
     </div>
   );
 }

@@ -10,5 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommentRequest {
     String postId;      // Id bài viết muốn comment
-    String content;     // Nội dung comment
+    String content;
+    String parentCommentId;
+    // Nội dung comment
 }

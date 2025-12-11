@@ -61,4 +61,29 @@ public class PostController {
             .result(postService.getNewsFeed(page, size))
             .build();
         }
+
+    @GetMapping("/{postId}/comments")
+    public ApiResponse<List<CommentResponse>> getComments(@PathVariable String postId) {
+        return ApiResponse.<List<CommentResponse>>builder()
+                .result(postService.getComments(postId))
+                .build();
+    }
+
+    @DeleteMapping("/comment/{commentId}")
+    public ApiResponse<Void> deleteComment(@PathVariable String commentId) {
+        postService.deleteComment(commentId);
+        return ApiResponse.<Void>builder()
+                .message("Comment deleted successfully")
+                .build();
+    }
+
+    @PutMapping("/comment/{commentId}")
+    public ApiResponse<CommentResponse> updateComment(
+            @PathVariable String commentId,
+            @RequestBody CommentRequest req
+    ) {
+        return ApiResponse.<CommentResponse>builder()
+                .result(postService.updateComment(commentId, req))
+                .build();
+    }
 }

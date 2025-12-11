@@ -16,7 +16,7 @@ public class CommentResponse {
     String userId;
     String content;
     LocalDateTime createdAt;
-
     String authorName;
     String authorAvatar;
+    String parentCommentId;
 }

@@ -23,5 +23,6 @@ public class Comment {
     String content;
     @CreatedDate
     LocalDateTime createdAt;
+    String parentCommentId;
 }
 

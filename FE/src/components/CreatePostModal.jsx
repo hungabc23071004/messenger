@@ -14,11 +14,16 @@ export default function CreatePostModal({ user, onClose, onPostCreated }) {
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files);
 
-    // Tạo preview
-    const previewUrls = files.map((file) => URL.createObjectURL(file));
-    setPreviews(previewUrls);
+    // Thêm files mới vào danh sách hiện có (không thay thế)
+    setImages((prevImages) => [...prevImages, ...files]);
+
+    // Tạo preview cho files mới và thêm vào danh sách preview
+    const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
+    setPreviews((prevPreviews) => [...prevPreviews, ...newPreviewUrls]);
+
+    // Reset input để có thể chọn lại cùng file
+    if (e.target) e.target.value = "";
   };
 
   const handleRemoveImage = (index) => {

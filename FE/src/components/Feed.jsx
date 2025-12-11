@@ -73,40 +73,20 @@ export default function Feed() {
         }
       }
 
-      // Subscribe to user queue (post + like)
-      subRef.current = client.subscribe(`/user/queue/feed`, (message) => {
-        const data = JSON.parse(message.body);
-        console.log("[WS] Nhận dữ liệu từ /user/queue/feed:", data);
-        // Nếu là bài viết mới
-        if (data.content && data.id) {
-          setPosts((prevPosts) => {
-            if (prevPosts.some((p) => p.id === data.id)) return prevPosts;
-            return [data, ...prevPosts];
-          });
-        }
-        // Nếu là cập nhật like
-        if (data.postId && typeof data.likeCount === "number") {
-          console.log("[WS] Nhận LikeResponse:", data);
-          setPosts((prevPosts) =>
-            prevPosts.map((p) => {
-              console.log("[WS] So sánh post:", p.id, "với", data.postId);
-              if (p.id !== data.postId) return p;
-              // So sánh userId trong LikeResponse với userId hiện tại
-              const myId = getCurrentUserId();
-              console.log("[WS] Cập nhật post:", p.id, {
-                likeCount: data.likeCount,
-                liked: data.userId === myId ? data.liked : p.liked,
-              });
-              return {
-                ...p,
-                likeCount: data.likeCount,
-                liked: data.userId === myId ? data.liked : p.liked,
-              };
-            })
+      // Subscribe to topic feed của user (nhận post + like events)
+      subRef.current = client.subscribe(
+        `/topic/feed.user.${userId}`,
+        (message) => {
+          const event = JSON.parse(message.body);
+          console.log(
+            "[WS] Nhận WebSocketEvent từ /topic/feed.user." + userId + ":",
+            event
           );
+
+          handleWebSocketEvent(event);
         }
-      });
-      console.log("Đã subscribe user queue feed:", `/user/queue/feed`);
+      );
+      console.log("Đã subscribe topic feed:", `/topic/feed.user.${userId}`);
     });
 
     return () => {
@@ -119,6 +99,39 @@ export default function Feed() {
       }
     };
   }, []);
+
+  // Xử lý WebSocket events với type discrimination
+  const handleWebSocketEvent = (event) => {
+    switch (event.type) {
+      case "POST_CREATED":
+        // Thêm post mới vào đầu danh sách
+        setPosts((prevPosts) => {
+          if (prevPosts.some((p) => p.id === event.data.id)) return prevPosts;
+          return [event.data, ...prevPosts];
+        });
+        break;
+
+      case "POST_LIKED":
+        // Cập nhật like count và liked status
+        setPosts((prevPosts) =>
+          prevPosts.map((p) => {
+            if (p.id !== event.data.postId) return p;
+
+            const myId = getCurrentUserId();
+            return {
+              ...p,
+              likeCount: event.data.likeCount,
+              // Chỉ cập nhật liked status nếu là chính mình like
+              liked: event.data.userId === myId ? event.data.liked : p.liked,
+            };
+          })
+        );
+        break;
+
+      default:
+        console.log("Unknown WebSocket event type:", event.type);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -156,6 +169,7 @@ export default function Feed() {
       ) : (
         posts.map((post) => {
           const mapped = {
+            id: post.id,
             user: {
               name: post.authorName || "Người dùng",
               avatar: post.authorAvatar || "",

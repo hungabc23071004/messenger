@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
@@ -20,12 +21,15 @@ import java.util.List;
 public class Post {
     @Id
     String id;
-
     String userId;
     String content;
-    List<String> images;
+    List<String> images= new ArrayList<>();
     @CreatedDate
     LocalDateTime createdAt;
-    int likeCount;
-    int commentCount;
+
+    @Builder.Default
+    int likeCount=0;
+
+    @Builder.Default
+    int commentCount=0;
 }

@@ -39,3 +39,24 @@ export const addComment = (data, token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+// Lấy tất cả comment của một post
+export const getComments = (postId, token) => {
+  return axios.get(`${API_URL}/${postId}/comments`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Xóa comment
+export const deleteComment = (commentId, token) => {
+  return axios.delete(`${API_URL}/comment/${commentId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
+// Sửa comment
+export const updateComment = (commentId, data, token) => {
+  return axios.put(`${API_URL}/comment/${commentId}`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
