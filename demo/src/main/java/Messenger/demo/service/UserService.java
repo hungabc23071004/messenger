@@ -1,5 +1,6 @@
 package Messenger.demo.service;
 
+import Messenger.demo.constant.MinIOPrefixUrl;
 import Messenger.demo.constant.MinioPrefixConstant;
 import Messenger.demo.dto.request.UserAvatarRequest;
 import Messenger.demo.dto.request.UserUpdateRequest;
@@ -56,7 +57,18 @@ public class UserService {
            String url = fileService.upload(request.getFile(), MinioPrefixConstant.AVATARS);
            user.setAvatarUrl(url);
            userRepository.save(user);
-           return url;
+           return MinIOPrefixUrl.MINIO_URL+ url;
+    }
+
+    public String uploadBanner(UserAvatarRequest request) {
+           User user = getCurrentUser();
+           if(user.getBannerUrl() != null){
+               fileService.delete(user.getBannerUrl());
+           }
+           String url = fileService.upload(request.getFile(), MinioPrefixConstant.BANNERS);
+           user.setBannerUrl(url);
+           userRepository.save(user);
+           return MinIOPrefixUrl.MINIO_URL+ url;
     }
 
     public UserResponse getUserById(String id) {

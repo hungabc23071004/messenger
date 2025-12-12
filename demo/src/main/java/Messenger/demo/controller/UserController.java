@@ -52,4 +52,12 @@ public class UserController {
                 .message("Get user information successfully")
                 .build();
     }
+
+    @PostMapping(value = "/banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> uploadBanner(@ModelAttribute UserAvatarRequest request) {
+        return ApiResponse.<String>builder()
+                .result(userService.uploadBanner(request))
+                .message("Upload banner successfully")
+                .build();   }
+
 }

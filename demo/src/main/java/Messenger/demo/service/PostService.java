@@ -305,4 +305,13 @@ public class PostService {
                 event
         );
     }
+
+    public List<PostResponse> getPostsByUserId(String userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<Post> posts = postRepo.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+
+        return posts.stream()
+                .map(this::toPostResponse)
+                .toList();
+    }
 }

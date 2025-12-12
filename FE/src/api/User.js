@@ -32,6 +32,17 @@ export const uploadAvatar = async (formData) => {
   return res.data;
 };
 
+// Upload banner (multipart/form-data)
+export const uploadBanner = async (formData) => {
+  const res = await axios.post(`${API_URL}/user/banner`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      ...getAuthHeader(),
+    },
+  });
+  return res.data;
+};
+
 // Lấy thông tin người dùng theo id
 export const getUserInfor = async (id) => {
   const res = await axios.get(`${API_URL}/user/${id}`);

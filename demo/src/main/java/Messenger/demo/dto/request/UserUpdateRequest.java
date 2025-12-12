@@ -12,4 +12,9 @@ public class UserUpdateRequest {
     LocalDate dateOfBirth;
     String fullName;
     String bio;
+    String phoneNumber;
+    String currentAddress;
+    String homeTown;
+    String education;
+    String work;
 }

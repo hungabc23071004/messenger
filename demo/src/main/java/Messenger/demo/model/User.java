@@ -34,6 +34,7 @@ public class User {
     // Profile
     String fullName;
     String avatarUrl;
+    String bannerUrl;
     String bio;
     String gender; // male, female, other
     LocalDate dateOfBirth;
@@ -43,8 +44,13 @@ public class User {
     LocalDateTime lastSeen;
 
     // Tối ưu load conversation list
-    List<String> conversationIds;
 
+
+    String phoneNumber;
+    String currentAddress;
+    String homeTown;
+    String education;
+    String work;
 
      Set<Role> roles;
 

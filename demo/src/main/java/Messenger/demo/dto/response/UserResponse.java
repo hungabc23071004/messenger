@@ -20,4 +20,11 @@ public class UserResponse {
     String avatarUrl;
     String bio;
     String status;
+    String bannerUrl;
+    String phoneNumber;
+    String currentAddress;
+    String homeTown;
+    String education;
+    String work;
+
 }

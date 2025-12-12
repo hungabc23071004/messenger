@@ -15,6 +15,9 @@ public interface UserMapper {
 
     @Mapping(target = "avatarUrl",
             expression = "java(user.getAvatarUrl() != null ? Messenger.demo.constant.MinIOPrefixUrl.MINIO_URL + user.getAvatarUrl() : null)")
+    @Mapping(target = "bannerUrl",
+            expression = "java(user.getBannerUrl() != null ? Messenger.demo.constant.MinIOPrefixUrl.MINIO_URL + user.getBannerUrl() : null)")
+
     UserResponse toUserResponse(User user);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

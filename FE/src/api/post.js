@@ -60,3 +60,10 @@ export const updateComment = (commentId, data, token) => {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+// Lấy tất cả post của một user
+export const getPostsByUserId = (userId, page = 0, size = 10, token) => {
+  return axios.get(`${API_URL}/user/${userId}?page=${page}&size=${size}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};

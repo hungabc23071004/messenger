@@ -12,4 +12,6 @@ import java.util.List;
 public interface PostRepository  extends MongoRepository<Post, String> {
 
     List<Post> findByUserIdInOrderByCreatedAtDesc(List<String> friendIds, Pageable pageable);
+
+    List<Post> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
 }

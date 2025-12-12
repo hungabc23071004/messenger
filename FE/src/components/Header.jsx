@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyInfor } from "../api/User";
+import { getCurrentUserId } from "../utils/auth";
 
 // React Icons
 import { FiSettings, FiHelpCircle, FiMoon, FiLogOut } from "react-icons/fi";
@@ -121,7 +122,13 @@ export default function Header() {
             {/* User */}
             <div
               className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer rounded-lg"
-              onClick={() => (window.location.href = "/profile")}
+              onClick={() => {
+                const userId = getCurrentUserId();
+                if (userId) {
+                  navigate(`/profile/${userId}`);
+                  setOpen(false);
+                }
+              }}
             >
               <img
                 src={

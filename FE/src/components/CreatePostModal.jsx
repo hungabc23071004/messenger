@@ -47,12 +47,16 @@ export default function CreatePostModal({ user, onClose, onPostCreated }) {
 
     try {
       const token = localStorage.getItem("token");
-      await createPost(formData, token);
+      const response = await createPost(formData, token);
 
       // Cleanup previews
       previews.forEach((url) => URL.revokeObjectURL(url));
 
-      if (onPostCreated) onPostCreated();
+      // Truyền post data về cho parent component
+      const newPost = response.data?.result || response.result;
+      if (onPostCreated && newPost) {
+        onPostCreated(newPost);
+      }
       onClose();
     } catch (error) {
       alert("Không thể tạo bài viết. Vui lòng thử lại!");
