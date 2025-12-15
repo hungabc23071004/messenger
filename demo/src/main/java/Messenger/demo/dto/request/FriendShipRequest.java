@@ -3,7 +3,8 @@ package Messenger.demo.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -11,4 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class FriendShipRequest {
     String friendId;
     String friendShipId;
+
+
 }

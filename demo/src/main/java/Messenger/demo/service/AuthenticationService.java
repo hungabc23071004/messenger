@@ -56,12 +56,9 @@ public class AuthenticationService {
     public UserResponse registerAccount(AccountRegisterRequest request) throws Exception {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Set.of(Role.valueOf("USER")))
-                .build();
+        User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(new HashSet<>(Collections.singletonList(Role.USER)));
 
         userRepository.save(user);
 

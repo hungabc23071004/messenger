@@ -61,7 +61,7 @@ public class WebSocketPresenceListener {
     }
 
     private List<String> getAllPeers(String userId) {
-        return friendshipRepository.findByInviterIdOrReceiverIdAndStatus(userId, userId, FriendShipStatus.ACCEPTED)
+        return friendshipRepository.findByInviterOrReceiverAndStatus(userId, FriendShipStatus.ACCEPTED)
                 .stream()
                 .map(f -> f.getInviterId().equals(userId) ? f.getReceiverId() : f.getInviterId())
                 .toList();

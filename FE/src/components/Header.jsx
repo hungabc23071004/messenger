@@ -47,7 +47,7 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white shadow flex items-center justify-between px-6 py-3 sticky top-0 z-50 relative">
+    <header className="w-full bg-white shadow-sm border-b flex items-center justify-between px-6 py-2 sticky top-0 z-50">
       {/* LEFT — Logo + Search */}
       <div className="flex items-center gap-3 flex-1">
         <div className="font-bold text-lg text-blue-600">Messenger Social</div>
@@ -59,25 +59,25 @@ export default function Header() {
       </div>
 
       {/* CENTER — Navigation Icons */}
-      <div className="flex items-center gap-2 text-gray-600 absolute left-1/2 -translate-x-1/2">
+      <div className="flex items-center gap-2 text-gray-600">
         <button
           onClick={() => navigate("/")}
-          className="relative px-12 py-3 bg-white rounded-lg transition group"
+          className="relative px-12 py-2.5 bg-white rounded-lg transition group"
         >
-          <AiFillHome className="text-blue-600 text-[18px]" />
+          <AiFillHome className="text-blue-600 text-xl" />
           <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-blue-600 rounded-t-md"></div>
         </button>
 
-        <button className="px-12 py-3 bg-white rounded-lg transition hover:bg-gray-100">
-          <MdOndemandVideo className="text-[18px] text-gray-500" />
+        <button className="px-12 py-2.5 bg-white rounded-lg transition hover:bg-gray-100">
+          <MdOndemandVideo className="text-xl text-gray-500" />
         </button>
 
-        <button className="px-12 py-3 bg-white rounded-lg transition hover:bg-gray-100">
-          <MdStorefront className="text-[18px] text-gray-500" />
+        <button className="px-12 py-2.5 bg-white rounded-lg transition hover:bg-gray-100">
+          <MdStorefront className="text-xl text-gray-500" />
         </button>
 
-        <button className="px-12 py-3 bg-white rounded-lg transition hover:bg-gray-100">
-          <MdGroups className="text-[18px] text-gray-500" />
+        <button className="px-12 py-2.5 bg-white rounded-lg transition hover:bg-gray-100">
+          <MdGroups className="text-xl text-gray-500" />
         </button>
 
         <button className="px-12 py-3 bg-white rounded-lg transition hover:bg-gray-100">

@@ -96,7 +96,7 @@ export default function ProfileHeader({ user, isOwnProfile }) {
               <div className="relative">
                 <img
                   src={
-                    avatarUrl ||
+                    aavatarUrl ||
                     "https://randomuser.me/api/portraits/men/32.jpg"
                   }
                   alt="avatar"

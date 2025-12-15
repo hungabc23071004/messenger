@@ -20,7 +20,8 @@ public enum ErrorCode {
     CONVERSATION_NOT_FOUND(1012,"Conversation hasn't been found" ,HttpStatus.NOT_FOUND ),
     PARTNER_NOT_FOUND(1013,"Partner has been not found" ,HttpStatus.NOT_FOUND ),
     POST_NOT_FOUND(1014,"Post has been not found" ,HttpStatus.NOT_FOUND ),
-    COMMENT_NOT_FOUND(1015,"Comment has been not found",HttpStatus.NOT_FOUND );
+    COMMENT_NOT_FOUND(1015,"Comment has been not found",HttpStatus.NOT_FOUND ),
+    CANNOT_ADD_YOURSELF_AS_FRIEND(1016,"Cannot send a friend request to yourself" ,HttpStatus.BAD_REQUEST );
 
 
     private Integer code;

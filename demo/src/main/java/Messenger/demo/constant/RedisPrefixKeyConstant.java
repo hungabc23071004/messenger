@@ -9,6 +9,7 @@ public class RedisPrefixKeyConstant {
     public final static String ONLINE ="ONLINE_";
     public final static String LAST_SEEN="LAST_SEEN_";
     public final static String UNREAD_MESSAGE_COUNT="UNREAD_";
+    public final static String FRIENDS="FRIENDS_";
     private RedisPrefixKeyConstant() {
     }
 }
